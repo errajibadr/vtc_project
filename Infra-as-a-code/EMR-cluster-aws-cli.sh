@@ -1,0 +1,15 @@
+aws emr create-cluster \
+ --name "Pyspark-Cluster" \
+ --log-uri "s3n://aws-logs-371858328372-eu-west-3/elasticmapreduce/" \
+ --release-label "emr-6.13.0" \
+ --service-role "arn:aws:iam::371858328372:role/AWS-EMR-ServiceRole" \
+ --ec2-attributes '{"InstanceProfile":"AWS-EMR-InstanceRole","EmrManagedMasterSecurityGroup":"sg-02c5d33b158df2c1a","EmrManagedSlaveSecurityGroup":"sg-0984f0f2c77d34c23","KeyName":"pem-ecr-test","AdditionalMasterSecurityGroups":[],"AdditionalSlaveSecurityGroups":[],"ServiceAccessSecurityGroup":"sg-0e7442a528ef9abc9","SubnetId":"subnet-0b0b56080476a571d"}' \
+ --tags 'for-use-with-amazon-emr-managed-policies=true' \
+ --applications Name=JupyterEnterpriseGateway Name=Spark Name=Zeppelin \
+ --configurations '[{"Classification":"iceberg-defaults","Properties":{"iceberg.enabled":"true"}},{"Classification":"spark-hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}}]' \
+ --instance-groups '[{"InstanceCount":6,"InstanceGroupType":"TASK","Name":"Tâche - 1","InstanceType":"c5.xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":32},"VolumesPerInstance":2}],"EbsOptimized":true}},{"InstanceCount":1,"InstanceGroupType":"MASTER","Name":"Primaire","InstanceType":"c5.2xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":32},"VolumesPerInstance":2}],"EbsOptimized":true}},{"InstanceCount":1,"InstanceGroupType":"CORE","Name":"Unité principale","InstanceType":"c5.2xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":32},"VolumesPerInstance":2}],"EbsOptimized":true}}]' \
+ --bootstrap-actions '[{"Args":[],"Name":"install boto3","Path":"s3://datalake-vtc/spark-emr-applications/emr-bootstrap-script.sh"}]' \
+ --scale-down-behavior "TERMINATE_AT_TASK_COMPLETION" \
+ --auto-termination-policy '{"IdleTimeout":3600}' \
+ --os-release-label "2.0.20230926.0" \
+ --region "eu-west-3"
